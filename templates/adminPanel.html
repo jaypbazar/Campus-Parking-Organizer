@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block menu %}
+<div class="dropdown-menu">
+    <li><a class="dropdown-item" href="/about">About</a></li>
+    <li><a class="dropdown-item" href="/terms">Terms &amp; Conditions</a></li>
+    <div class="dropdown-divider"></div>
+    <li><a class="dropdown-item" href="/logout">Log out</a></li>
+  </div>
+{% endblock menu %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-10 bg-light">
+        <br><br>
+        <h3>Welcome, Administrator!</h3>
+    </div>
+    <div class="col-1"></div>
+  </div>
+{% endblock content %}

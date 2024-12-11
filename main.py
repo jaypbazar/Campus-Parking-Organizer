@@ -37,6 +37,9 @@ def login():
             if user:
                 session['user_id'] = user[0]
 
+                if user[4] == "admin":
+                    return redirect(url_for('adminPanel', id = session['user_id']))
+
                 return redirect(url_for('index', id = session['user_id']))
 
             else:
@@ -46,9 +49,10 @@ def login():
             conn.close()
 
         except Exception as e:
+            session.clear()
             flash("Login failed. Please try again.", "danger")
             print(f"Login Error: {e}")
-
+    
     return render_template('login.html')
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -86,6 +90,15 @@ def signup():
             print(f"Signup Error: {e}")
                 
     return render_template('signup.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
+
+@app.route('/adminPanel')
+def adminPanel():
+    return render_template('adminPanel.html')
 
 def validate_duplicate(column_name: str, data: str) -> None:
     '''
