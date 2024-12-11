@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block menu %}
-<div class="dropdown-menu">
+<div class="dropdown-menu dropdown-menu-end dropdown-menu-start-md">
     <li><a class="dropdown-item" href="/about">About</a></li>
     <li><a class="dropdown-item" href="/terms">Terms &amp; Conditions</a></li>
     <div class="dropdown-divider"></div>
     {% if id %}
         <li><a class="dropdown-item" href="/logout">Log out</a></li>
     {% else %}
-        <li><a class="dropdown-item" href="/login">Log in/Sign up</a></li>
+        <li><a class="dropdown-item" href="/login">Log in or Sign up</a></li>
     {% endif %}
   </div>
 {% endblock menu %}
@@ -18,10 +18,11 @@
     <div class="row">
         <div class="col-1"></div>
         <div class="col-10">
-            <br><br>
-            <h6 class="text-white">Available Parking Space: <span class="text-danger">0</span></h6>
-            <div class="container" style="height: 30rem;">
-                <div id="campusMap" style="width: 100%; height: 100%;"></div>
+            <div class="mt-4 p-3", style="--bs-bg-opacity: .5">
+                <h6 class="text-white">Available Parking Space: <span id="lotNumbers" style="color: #6aff00">6</span></h6>
+                <div class="container" style="height: 30rem;">
+                    <div id="campusMap" style="width: 100%; height: 100%;"></div>
+                </div>
             </div>
         </div>
         <div class="col-1"></div>

@@ -1,5 +1,5 @@
 from flask import Flask, request, session, redirect, render_template, url_for, flash
-from backend import connectSQL, encrypt
+from backend import *
 
 app = Flask(__name__)
 app.secret_key = '@SE_S3cr3t_K3y!'
@@ -7,18 +7,30 @@ app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
 
 @app.route('/')
 def index():
+    if 'user_id' in session:
+        return render_template('index.html', id = session['user_id'])
+    
     return render_template("index.html")
 
 @app.route('/about')
 def about():
+    if 'user_id' in session:
+        return render_template('about.html', id = session['user_id'])
+    
     return render_template('about.html')
 
 @app.route('/terms')
 def terms():
+    if 'user_id' in session:
+        return render_template('terms.html', id = session['user_id'])
+
     return render_template('terms.html')
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
+    if 'user_id' in session:
+        return redirect(url_for("index", id = session['user_id']))
+    
     if request.method == "POST":
         user_id = request.form.get('id')
         password = encrypt(request.form.get('password'))
@@ -43,6 +55,7 @@ def login():
                 return redirect(url_for('index', id = session['user_id']))
 
             else:
+                session.clear()
                 flash("Wrong email or password. Please try again.", "danger")
 
             cursor.close()
@@ -94,44 +107,16 @@ def signup():
 @app.route('/logout')
 def logout():
     session.clear()
+    flash("Logged out successfully.", "success")
     return redirect(url_for("index"))
 
-@app.route('/adminPanel')
-def adminPanel():
-    return render_template('adminPanel.html')
-
-def validate_duplicate(column_name: str, data: str) -> None:
-    '''
-A function that validates the user input from a form for its uniqueness
+@app.route('/adminPanel/<user_id>')
+def adminPanel(user_id):
+    if 'user_id' in session:
+        return render_template('adminPanel.html', id = session['user_id'])
     
-Parameters:
-    column_name - the name of the table column from the database
-    
-    data - the current value to validate
-    
-Returns:
-    redirect() - redirects the user to same page then display error message if duplicate'''
-    
-    try:
-        conn = connectSQL()
-        cursor = conn.cursor()
-
-        query = f"SELECT {column_name} FROM users"
-        cursor.execute(query)
-
-        data = data.lower()
-        list = [row[0].lower() for row in cursor.fetchall()]
-
-        cursor.close()
-        print(data)
-        print(list)
-
-        if data in list: 
-            flash(f"Error: {column_name} already exists!", "danger")
-            return redirect(url_for('signup'))
-
-    except Exception as e:
-        print(f"Database Error: {e}")
+    flash("You must log in first.", "danger")
+    return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

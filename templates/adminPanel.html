@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block menu %}
-<div class="dropdown-menu">
+<div class="dropdown-menu dropdown-menu-end dropdown-menu-start-md">
     <li><a class="dropdown-item" href="/about">About</a></li>
     <li><a class="dropdown-item" href="/terms">Terms &amp; Conditions</a></li>
     <div class="dropdown-divider"></div>
@@ -12,10 +12,22 @@
 {% block content %}
   <div class="row">
     <div class="col-1"></div>
-    <div class="col-10 bg-light">
+    <div class="col-10">
         <br><br>
-        <h3>Welcome, Administrator!</h3>
+        <div class="bg-primary-subtle text-black rounded-3 p-2 m-2">
+            <h3 class="text-center m-2">Welcome, Administrator!</h3>
+            <hr>
+            
+        </div>
     </div>
     <div class="col-1"></div>
   </div>
+<script>
+    window.onload = function() {
+      {% if not id %}
+        // Refresh the current page
+        location.reload();
+      {% endif %}
+    };
+    </script>
 {% endblock content %}
