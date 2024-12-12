@@ -8,28 +8,28 @@ app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
 @app.route('/')
 def index():
     if 'user_id' in session:
-        return render_template('index.html', id = session['user_id'])
+        return render_template('index.html', user = session['user_id'])
     
     return render_template("index.html")
 
 @app.route('/about')
 def about():
     if 'user_id' in session:
-        return render_template('about.html', id = session['user_id'])
+        return render_template('about.html', user = session['user_id'])
     
     return render_template('about.html')
 
 @app.route('/terms')
 def terms():
     if 'user_id' in session:
-        return render_template('terms.html', id = session['user_id'])
+        return render_template('terms.html', user = session['user_id'])
 
     return render_template('terms.html')
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if 'user_id' in session:
-        return redirect(url_for("index", id = session['user_id']))
+        return redirect(url_for("index", user = session['user_id']))
     
     if request.method == "POST":
         user_id = request.form.get('id')
@@ -50,9 +50,9 @@ def login():
                 session['user_id'] = user[0]
 
                 if user[4] == "admin":
-                    return redirect(url_for('adminPanel', id = session['user_id']))
+                    return redirect(url_for('adminPanel', user = session['user_id']))
 
-                return redirect(url_for('index', id = session['user_id']))
+                return redirect(url_for('index', user = session['user_id']))
 
             else:
                 session.clear()
@@ -110,10 +110,27 @@ def logout():
     flash("Logged out successfully.", "success")
     return redirect(url_for("index"))
 
-@app.route('/adminPanel/<user_id>')
-def adminPanel(user_id):
+@app.route('/adminPanel/<user>')
+def adminPanel(user):
     if 'user_id' in session:
-        return render_template('adminPanel.html', id = session['user_id'])
+        try:
+            conn = connectSQL()
+            cursor = conn.cursor()
+
+            query = "SELECT role FROM users WHERE role = 'admin'"
+            cursor.execute(query)
+
+            role = cursor.fetchone()
+            
+            print(role)
+    
+            if role == 'admin':
+                return render_template('adminPanel.html', user = session['user_id'])
+            else:
+                flash("Access denied! Only admins are allowed.", "danger")
+                return redirect(url_for("index"))
+        except Exception as e:
+            print(f"Admin Panel Error: {e}")
     
     flash("You must log in first.", "danger")
     return redirect(url_for("login"))

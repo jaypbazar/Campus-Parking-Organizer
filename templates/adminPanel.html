@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Admin Panel{% endblock title %}
+
 {% block menu %}
 <div class="dropdown-menu dropdown-menu-end dropdown-menu-start-md">
     <li><a class="dropdown-item" href="/about">About</a></li>
@@ -15,19 +17,11 @@
     <div class="col-10">
         <br><br>
         <div class="bg-primary-subtle text-black rounded-3 p-2 m-2">
-            <h3 class="text-center m-2">Welcome, Administrator!</h3>
+            <h3 class="text-center m-2">Welcome, Administrator{% if user %} {{user}}{% endif %}!</h3>
             <hr>
             
         </div>
     </div>
     <div class="col-1"></div>
   </div>
-<script>
-    window.onload = function() {
-      {% if not id %}
-        // Refresh the current page
-        location.reload();
-      {% endif %}
-    };
-    </script>
 {% endblock content %}

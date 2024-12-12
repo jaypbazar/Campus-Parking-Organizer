@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Log in{% endblock title %}
+
 {% block menu %}
 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-start-md">
     <li><a class="dropdown-item" href="/">Home</a></li>
@@ -9,8 +11,8 @@
 {% endblock menu %}
 
 {% block content %}
-<br><br>
-<div class="container w-50 h-100 py-3 my-4 rounded-5 bg-light bg-opacity-50 text-black">
+  <br><br>
+  <div class="container w-50 h-100 py-3 my-4 rounded-5 bg-light bg-opacity-50 text-black">
 
     <ul class="nav nav-tabs row align-items-center border-0">
         <li class="nav-item text-center col">
@@ -47,6 +49,5 @@
         </div>
       </div>
     </div>
-
   </div>
 {% endblock content %}
