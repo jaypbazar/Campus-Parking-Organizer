@@ -101,6 +101,8 @@ def signup():
 def booking():
     if 'user_id' in session:
         # TODO: add booking data to database
+        
+
         flash("Reserved Successfully.", "success")
         return redirect(url_for("index"))
 
