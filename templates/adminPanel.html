@@ -4,6 +4,7 @@
 
 {% block menu %}
 <div class="dropdown-menu dropdown-menu-end dropdown-menu-start-md">
+    <li><a class="dropdown-item" href="/">Home</a></li>
     <li><a class="dropdown-item" href="/about">About</a></li>
     <li><a class="dropdown-item" href="/terms">Terms &amp; Conditions</a></li>
     <div class="dropdown-divider"></div>
@@ -16,8 +17,8 @@
     <div class="col-1"></div>
     <div class="col-10">
         <br><br>
-        <div class="bg-primary-subtle text-black rounded-3 p-2 m-2">
-            <h3 class="text-center m-2">Welcome, Administrator{% if user %} {{user}}{% endif %}!</h3>
+        <div class="bg-light text-black rounded-3 p-2 m-2" style="--bs-bg-opacity: .5">
+            <h3 class="text-center m-2">Welcome, Administrator {{session.user_id}}!</h3>
             <hr>
             
         </div>
