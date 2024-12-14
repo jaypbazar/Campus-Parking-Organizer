@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (parkingSpaceSelect.options.length <= 1) {  // 1 accounts for the initial default/placeholder option
             createReservationButton.disabled = true;
             createReservationButton.classList.add('disabled');
-            showValidationError("No parking lots available for reservation.");
+            showValidationError("Unable to add reservations at the moment.");
         } else {
             createReservationButton.disabled = false;
             createReservationButton.classList.remove('disabled');

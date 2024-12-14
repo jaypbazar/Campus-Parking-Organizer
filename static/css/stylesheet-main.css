@@ -30,3 +30,9 @@ body {
 p {
     text-align: justify;
 }
+
+.semi-disabled {
+    pointer-events: none;
+    background-color: #e9ecef;
+    color: #6c757d;
+}

@@ -32,14 +32,14 @@ def index():
         lots = []  # Ensure lots is defined even if there's an error
         color = '#6aff00'
 
-    if session['no_of_available_lots'] < 1: 
-        color = '#ff2828'
-    elif session['no_of_available_lots'] < 3:
+    if session.get('no_of_available_lots') > 2: 
+        color = '#34ff12'
+    elif session.get('no_of_available_lots') > 0:
         color = '#ffff00'
     else: 
-        color = '#34ff12'
+        color = '#ff2828'
 
-    return render_template("index.html", parkingLots=lots, available_lots=session['no_of_available_lots'], color=color)
+    return render_template("index.html", parkingLots=lots, available_lots=session.get('no_of_available_lots'), color=color)
 
 @app.route('/about')
 def about():
@@ -75,6 +75,8 @@ def login():
 
                 if session.get('role') == "admin":
                     return redirect(url_for('adminPanel'))
+
+                return(redirect(url_for('index')))
             else:
                 session.clear()
                 flash("Wrong email or password. Please try again.", "danger")
@@ -165,6 +167,65 @@ def booking():
 
     return redirect(url_for("index"))
 
+@app.route('/update_booking', methods=["POST"])
+def update_booking():
+    parkingLotName = request.form.get('lot_name')
+    bookingDate = request.form.get('booking_date')
+    startTime = request.form.get('time_start')
+    endTime = request.form.get('time_end')
+
+    try:
+        conn = connectSQL()
+        cursor = conn.cursor()
+
+        query = "UPDATE bookings SET bookingDate = %s, timeStarted = %s, timeEnded = %s WHERE lotName = %s"
+        values = (bookingDate, startTime, endTime, parkingLotName)
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        flash("Reservation updated successfully.", "success")
+
+        cursor.close()
+        conn.close()
+    
+    except Exception as e:
+        flash("Error updating reservation.", "danger")
+        print(f"Reservation Update Error: {e}")
+
+    return redirect(url_for('adminPanel'))
+
+@app.route('/delete_booking', methods=["POST"])
+def delete_booking():
+    parkingLotName = request.form.get('lotName')
+
+    try:
+        conn = connectSQL()
+        cursor = conn.cursor()
+
+        query = "DELETE FROM bookings WHERE lotName = %s"
+        values = (parkingLotName,)
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        query = "UPDATE parking_lots SET status = %s WHERE name = %s"
+        values = ('available', parkingLotName)
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        flash("Reservation removed successfully.", "success")
+
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        flash("Error in deleting reservation.", "danger")
+        print(f"Deleting Error: {e}")
+    
+    return redirect(url_for('adminPanel'))
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -175,13 +236,56 @@ def logout():
 def adminPanel():
     if 'user_id' in session:
         if session.get('role') == 'admin':
-            return render_template('adminPanel.html')
+            try:
+                conn = connectSQL()
+                cursor = conn.cursor()
+
+                query = "SELECT * FROM parking_lots"
+                cursor.execute(query) 
+
+                lots = cursor.fetchall()
+
+                query = "SELECT * FROM bookings"
+                cursor.execute(query)
+
+                bookings = cursor.fetchall()
+
+            except Exception as e:
+                print(f"Admin Panel Error: {e}")
+                
+            return render_template('adminPanel.html', parkingLots=lots, reservations=bookings)
         
         flash("Access denied! Only admins are allowed.", "danger")
         return redirect(url_for("index"))
     
     flash("You must log in first.", "danger")
     return redirect(url_for("login"))
+
+@app.route('/update_status', methods=["POST"])
+def update_status():
+    lotName = request.form.get('lot_name')
+    status = request.form.get('status')
+
+    try:
+        conn = connectSQL()
+        cursor = conn.cursor()
+
+        query = "UPDATE parking_lots SET status = %s WHERE name = %s"
+        values = (status, lotName)
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        flash("Parking status updated successfully.", "success")
+
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        flash("Error updating details. Try again.", "danger")
+        print(f"Update Error: {e}")
+
+    return redirect(url_for('adminPanel'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
