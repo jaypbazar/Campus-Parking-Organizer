@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const reservationDateInput = document.getElementById('reservationDate');
     const startTimeInput = document.getElementById('startTime');
     const endTimeInput = document.getElementById('endTime');
+    const parkingSpaceSelect = document.getElementById('parkingSpace');
+    const createReservationButton = bookingForm.querySelector('button[type="submit"]');
     const errorContainer = document.createElement('div');
     errorContainer.classList.add('text-danger', 'my-2', 'col-12', 'text-center');
 
@@ -12,6 +14,26 @@ document.addEventListener('DOMContentLoaded', function() {
         errorContainer.textContent = message;
         endTimeInput.parentNode.parentNode.insertBefore(errorContainer, endTimeInput.parentNode.nextSibling);
     }
+
+    // Function to check parking lot availability and button state
+    function checkParkingLotAvailability() {
+        // Disable create button if no parking lots are available
+        if (parkingSpaceSelect.options.length <= 1) {  // 1 accounts for the initial default/placeholder option
+            createReservationButton.disabled = true;
+            createReservationButton.classList.add('disabled');
+            showValidationError("No parking lots available for reservation.");
+        } else {
+            createReservationButton.disabled = false;
+            createReservationButton.classList.remove('disabled');
+            // Clear any previous error message about parking lots
+            if (errorContainer.textContent.includes("No parking lots available")) {
+                errorContainer.textContent = '';
+            }
+        }
+    }
+
+    // Check parking lot availability when the page loads
+    checkParkingLotAvailability();
 
     // Add form submission validation
     bookingForm.addEventListener('submit', function(event) {
@@ -40,4 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
             errorContainer.textContent = '';
         }
     });
+
+    // Optionally, add an event listener to recheck availability if parking lots are dynamically populated
+    const observer = new MutationObserver(checkParkingLotAvailability);
+    observer.observe(parkingSpaceSelect, { childList: true });
 });

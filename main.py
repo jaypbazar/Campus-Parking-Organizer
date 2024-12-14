@@ -7,7 +7,39 @@ app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    session['no_of_available_lots'] = 0
+    try:
+        conn = connectSQL()
+        cursor = conn.cursor()
+
+        query = "SELECT * FROM parking_lots"
+
+        cursor.execute(query) 
+
+        # Convert database results to a list of dictionaries
+        lots = []
+        for row in cursor.fetchall():
+            lots.append({
+                'name': row[0],
+                'coords': [[row[1], row[2]], [row[3], row[4]]],
+                'status': row[5]
+            })
+            if row[5] == 'available':
+                session['no_of_available_lots'] += 1
+
+    except Exception as e:
+        print(f"Index Error: {e}")
+        lots = []  # Ensure lots is defined even if there's an error
+        color = '#6aff00'
+
+    if session['no_of_available_lots'] < 1: 
+        color = '#ff2828'
+    elif session['no_of_available_lots'] < 3:
+        color = '#ffff00'
+    else: 
+        color = '#34ff12'
+
+    return render_template("index.html", parkingLots=lots, available_lots=session['no_of_available_lots'], color=color)
 
 @app.route('/about')
 def about():
@@ -100,13 +132,37 @@ def signup():
 @app.route('/booking', methods=["POST", "GET"])
 def booking():
     if 'user_id' in session:
-        # TODO: add booking data to database
-        
+        parkingLot = request.form.get('parkingSpace')
+        bookingDate = request.form.get('reservationDate')
+        startTime = request.form.get('startTime')
+        endTime = request.form.get('endTime')
+
+        try:
+            conn = connectSQL()
+            cursor = conn.cursor()
+
+            query = "INSERT INTO bookings VALUES(%s, %s, %s, %s, %s)"
+            values = (parkingLot, bookingDate, startTime, endTime, session.get('user_id'))
+
+            cursor.execute(query, values)
+            conn.commit()
+
+            query = "UPDATE parking_lots SET status = %s WHERE name = %s"
+            values = ('reserved', parkingLot)
+            
+            cursor.execute(query, values)
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            flash("Reservation failed. Try again.", "danger")
+            print(f"Booking Error: {e}")
 
         flash("Reserved Successfully.", "success")
         return redirect(url_for("index"))
 
-    flash("Reservation failed. Try again.", "danger")
     return redirect(url_for("index"))
 
 @app.route('/logout')

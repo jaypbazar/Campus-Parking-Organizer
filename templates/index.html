@@ -66,7 +66,7 @@
             <div class="col-1"></div>
             <div class="col-10">
                 <div class="mt-4 p-3", style="--bs-bg-opacity: .5">
-                    <h5 class="text-white p-2">Available Parking Space: <span id="lotNumbers" style="color: #6aff00">6</span></h5>
+                    <h5 class="text-white p-2">Available Parking Space: <span id="lotNumbers" style="color: {{color}}">{{available_lots}}</span></h5>
                     <div class="container" style="height: 30rem;">
                         <div id="campusMap" style="width: 100%; height: 100%;"></div>
                     </div>
@@ -76,6 +76,7 @@
         </div>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>var parkingLots = {{ parkingLots | tojson | safe }};</script>
     <script src="../static/js/initialize_map.js"></script>
     <script src="../static/js/populate_lot_option.js"></script>
     <script src="../static/js/validate_reservation.js"></script>
